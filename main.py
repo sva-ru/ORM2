@@ -83,7 +83,7 @@ def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
         arg_list = {'first_name': first_name, "last_name": last_name, 'email': email, 'phone_number': phone}
         for key, arg in arg_list.items():
             if arg:
-                cur.execute(SQL("select C.first_name || ' ' || C.last_name  as client from CLIENT C left join PHONE P on C.id = P.id_client WHERE {}=%s").format(Identifier(key)),
+                cur.execute(SQL("SELECT c.first_name || ' ' || c.last_name  as client FROM client c LEFT JOIN phone p on c.id = p.id_client WHERE {}=%s").format(Identifier(key)),
                             (arg,))
         client_list = ["".join(it) for it in cur.fetchall()]
     return f'Найдены клиенты: {", ".join(client_list)}'
