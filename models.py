@@ -63,11 +63,16 @@ class Sale(Base):
     def __str__(self):
         return f'Sale {self.price}'
 
-def find_publisher(conn, name):
-    publ = conn.query(Publisher.id, Book.title, Shop.name, Sale.price, Sale.date_sale).filter(
-        Publisher.name.like(f'%{name}%')).join(Book).join(Stock).join(Shop).join(Sale).all()
-    return publ
+def get_shops(conn, find_publ):
+    if not find_publ.isdigit():
+        publ = conn.query(Publisher.id, Book.title, Shop.name, Sale.price, Sale.date_sale).filter(
+            Publisher.name.like(f'%{find_publ}%')).join(Book).join(Stock).join(Shop).join(Sale).all()
+    else:
+        publ = conn.query(Publisher.id, Book.title, Shop.name, Sale.price, Sale.date_sale).filter(
+            Publisher.id == find_publ).join(Book).join(Stock).join(Shop).join(Sale).all()
 
+    for id_p, book, shop, price_sale, date_sale in publ:
+        print(f"{book: <40} | {shop: <15} | {price_sale: <8} | {date_sale.strftime('%d-%m-%Y')}")
 
 
 if __name__ == '__main__':
@@ -75,6 +80,5 @@ if __name__ == '__main__':
     passw = 'postgres'
     name_db = 'netology_db'
     conn = connect_db_postgres(login, passw, name_db)
-    f_p = input('Укажите фамилию автора: ')
-    for it in find_publisher(conn, f_p):
-        print(f'{it[1]} | {it[2]} | {it[3]} | {format(it[4],"%d-%m-%Y")}')
+    publ_find = input("Укажите фамилию автора или его ID: ")
+    get_shops(conn, publ_find)
